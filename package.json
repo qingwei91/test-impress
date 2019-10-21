@@ -41,5 +41,9 @@
     "syn": "^0.13.0",
     "terser": "^3.17.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "js-yaml": "^3.13.1",
+    "lodash": "^4.17.13",
+    "set-value": "2.0.1"
+  }
 }
