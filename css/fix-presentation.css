@@ -37,8 +37,8 @@ pre {
 }
 
 img {
-    max-width: 800px;
-    max-height: 600px;
+    max-width: 95vw;
+    max-height: 80vh;
 }
 
 .center {
