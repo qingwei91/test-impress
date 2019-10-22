@@ -201,6 +201,7 @@
         <p>A fixed point is a value in the function's domain</p>
         <p>that when applied to the function, map to the same value</p>
         <h3 class="center large">f(x) = x</h3>
+        <p>Insight: Fixed point is only definable with a function</p>
     </div>
     <div class="step slide" data-x="3600" data-y="-1500">
         <p>Example, the square function, f(x) = x^2</p>
@@ -210,7 +211,7 @@
     </div>
 
     <div class="step slide" data-x="4800" data-y="-1500">
-        <h2>Expansion</h2>
+        <h2>Substitution</h2>
         <p>given a function <strong>f</strong></p>
         <pre>
             <code>
@@ -224,7 +225,6 @@
         <p>Insight: fix(f) can express arbitrarily nested recursion</p>
     </div>
     <div class="step slide" data-x="6000" data-y="-1500">
-        <h2>Higher Kinded Type is </h2>
         <h2>Type Level Function</h2>
         <pre>
             <code class="scala">
@@ -302,7 +302,7 @@
             <code class="scala">
     // this represents 2
     One(One(Zero()))
-    // type == Peano[Peano[Peano[Nothing]]
+    // type == Peano[Peano[Peano[Nothing]]]
 
     case class Fix[F[_]](unfix: F[Fix[F]])
 
@@ -311,7 +311,6 @@
         Fix(Zero())
       ))
     ))
-
     // type == Fix[Peano]
             </code>
         </pre>
@@ -320,53 +319,131 @@
         <h3>Generic representation allows generic algorithms</h3>
         <pre>
             <code class="scala">
-    def addAll(peano: Peano[Peano[Peano[Nothing]]): Int = ???
+    def addAll(peano: Peano[Peano[Peano[Nothing]]]): Int = ???
 
     def addAll(peano: Fix[Peano]): Int = ???
+
             </code>
         </pre>
     </div>
 
     <div class="step slide" data-x="8400" data-y="-500">
-        <h3>This was unnecessary pain</h3>
+        <h3>It was overly complicated</h3>
         <pre>
             <code class="scala">
     sealed trait Peano[A]
     case class One[A](a: A) extends Peano[A]
     case class Zero[A]()  extends Peano[A]
 
-    One(One(Zero)) // type = Peano[Peano[Peano[Nothing]]
+    One(One(Zero())) // type = Peano[Peano[Peano[Nothing]]]
 
-    sealed trait Peano
-    case class One(p: Peano) extends Peano
-    case object Zero extends Peano
+    sealed trait Peano2
+    case class One(p: Peano2) extends Peano2
+    case object Zero extends Peano2
 
-    One(One(Zero)) // type = Peano
+    One(One(Zero)) // type = Peano2
+
             </code>
         </pre>
-    </div>
-
-    <div class="step slide" data-x="8400" data-y="-500">
-        <pre>
-            <code class="scala">
-    sealed trait Peano
-    case class One(p: Peano) extends Peano
-    case object Zero extends Peano
-
-    def addAll(peano: Peano): Int = ???
-            </code>
-        </pre>
-        <p class="center">Problem solved</p>
     </div>
 
     <div class="step slide" data-x="8400" data-y="-500">
         <h3>Generic representation allows generic algorithms</h3>
         <pre>
             <code class="scala">
-    def collapse[F[_]](fix: Fix[F])(fold: F[A] => A): A
+    def addAll(peano: Peano[Peano[Peano[Nothing]]]): Int = ???
+
+    def addAll(peano: Fix[Peano]): Int = ???
+
+    // Best of both worlds?!
+    <strong>def addAll(peano: Peano2): Int = ???</strong>
             </code>
         </pre>
     </div>
+
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h3>One gains power by going abstract</h3>
+        <pre>
+            <code class="scala">
+    def collapse[F[_], A](fix: Fix[F])(fold: F[A] => A): A
+    // catamorphism
+            </code>
+        </pre>
+    </div>
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h3>Cata-morphism????</h3>
+        <pre>
+
+    Reminder: fix(f) = f(f(f(fix(f))))
+
+    if we have ways to
+    * f(fix(f)) => f(a)
+    * f(a) => a
+
+    We could do this
+    f(f(f(fix(f))))
+    f(f(f(a)))
+    f(f(a))
+    f(a)
+    a
+        </pre>
+    </div>
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h3>Part 1: f(fix(f)) => f(a)</h3>
+        <pre>
+            <code class="python">
+    case class Zero[A]() extends Peano[A]
+
+    Zero[Fix[Peano]]() => Zero[A]()
+    // Peano[Fix[Peano]] => Peano[A]
+
+            </code>
+        </pre>
+    </div>
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h3>Part 2: f(a) => a</h3>
+        <pre>
+            <code class="python">
+
+    def fold: Peano[Int] => Int = {
+      case Zero() => 0
+      case One(i) => i + 1
+    }
+
+    One(One(Zero))
+    One(One(0))
+    One(1+0)
+    1+1+0
+            </code>
+        </pre>
+    </div>
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h3>Combined</h3>
+        <pre>
+            <code class="python">
+
+    One(One(Zero)) // Step 1: Zero[Fix[Peano]] => Zero[Int]
+    One(One(0))    // Step 2: Zero[Int] => Int
+    One(1+0)       // Step 3: One[Int] => Int
+    1+1+0          // Step 4: Int!!
+            </code>
+        </pre>
+    </div>
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h3>Comparison</h3>
+        <img src="https://user-images.githubusercontent.com/6303687/67303788-d7b50480-f4ea-11e9-8157-880aca85fa48.png" alt=""/>
+    </div>
+
+    <div class="step slide" data-x="8400" data-y="-500">
+        <h2>Summary</h2>
+        <ul>
+            <li>Fix point is a value of a function's domain where f(x)=x </li>
+            <li>Fix point can be defined for type level function</li>
+            <li>When used at type level, Fix Point can represent arbitrary layer of recursive data structure</li>
+            <li>The benefit of using Fix is to be able to leverage library code</li>
+        </ul>
+    </div>
+
 
     <div id="overview" class="step" data-x="3000" data-y="1500" data-z="0" data-scale="10">
     </div>
@@ -421,6 +498,7 @@
 -->
 <script src="js/impress.js"></script>
 <script>impress().init();</script>
+<script>hljs.initHighlightingOnLoad();</script>
 
 <!--
     
