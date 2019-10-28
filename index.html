@@ -126,72 +126,11 @@
     <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
 </div>
 
-<!--
-    
-    Now that's the core element used by impress.js.
-    
-    That's the wrapper for your presentation steps. In this element all the impress.js magic happens.
-    It doesn't have to be a `<div>`. Only `id` is important here as that's how the script find it.
-    
-    You probably won't need it now, but there are some configuration options that can be set on this element.
-    
-    To change the duration of the transition between slides use `data-transition-duration="2000"` giving it
-    a number of ms. It defaults to 1000 (1s).
-    
-    You can also control the perspective with `data-perspective="500"` giving it a number of pixels.
-    It defaults to 1000. You can set it to 0 if you don't want any 3D effects.
-    If you are willing to change this value make sure you understand how CSS perspective works:
-    https://developer.mozilla.org/en/CSS/perspective
-    
-    But as I said, you won't need it for now, so don't worry - there are some simple but interesting things
-    right around the corner of this tag ;)
-    
-    ----------
-    Plugins: We set the default time for autoplay plugin to 6 seconds. Autoplay will automatically advance
-    to next slide after a timeout expires.
-    
--->
 <div id="impress">
 
-    <!--
-        
-        Here is where interesting thing start to happen.
-        
-        Each step of the presentation should be an element inside the `#impress` with a class name
-        of `step`. These step elements are positioned, rotated and scaled by impress.js, and
-        the 'camera' shows them on each step of the presentation.
-        
-        Positioning information is passed through data attributes.
-        
-        In the example below we only specify x and y position of the step element with `data-x="-1000"`
-        and `data-y="-1500"` attributes. This means that **the center** of the element (yes, the center)
-        will be positioned in point x = -1000px and y = -1500px of the presentation 'canvas'.
-        
-        It will not be rotated or scaled.
-        
-        --------
-        Plugins: For first slide, set the autoplay time to a custom 10 seconds.
-        
-    -->
     <div class="step slide" data-x="0" data-y="-1500">
         <h1 id="title">Fix Point from First Principle</h1>
     </div>
-
-    <!--
-        
-        The `id` attribute of the step element is used to identify it in the URL, but it's optional.
-        If it is not defined, it will get a default value of `step-N` where N is a number of slide.
-        
-        So in the example below it'll be `step-2`.
-        
-        The hash part of the url when this step is active will be `#/step-2`.
-        
-        You can also use `#step-2` in a link, to point directly to this particular step.
-        
-        Please note, that while `#/step-2` (with slash) would also work in a link it's not recommended.
-        Using classic `id`-based links like `#step-2` makes these links usable also in fallback mode.
-        
-    -->
     <div class="step slide" data-x="1200" data-y="-1500">
         <h3>Function</h3>
         <img src="https://user-images.githubusercontent.com/6303687/67205886-93513800-f408-11e9-84ca-6a234f66a694.png" alt=""/>
@@ -210,15 +149,15 @@
         <p class="center">square(0) = 0, square(1) = 1</p>
         <p class="center">Fix point = {0, 1}</p>
     </div>
-
     <div class="step slide" data-x="4800" data-y="-1500">
         <h2>Define fix function</h2>
         <pre>
             <code>
-    def fix(f) = .... // Eg. fix(square_fn) = 0
+    fix(f) = x
+    where f(x) = x // Eg. fix(square_fn) = 0
 
-    let x = fix(f)
-    x = f(x)
+    let i = fix(f)
+    i = f(i)
     fix(f) = f(fix(f))
     fix(f) = f(f(fix(f)))
     fix(f) = f(f(f(fix(f)))) // When does it ends?
@@ -260,7 +199,6 @@
             </code>
         </pre>
     </div>
-
     <div class="step slide" data-x="8400" data-y="-1500">
         <h3>Example, Peano Number</h3>
         <pre>
@@ -323,7 +261,6 @@
             </code>
         </pre>
     </div>
-
     <div class="step slide" data-x="10800" data-y="-1500">
         <h3>It was over-complicated</h3>
         <pre>
@@ -342,7 +279,6 @@
             </code>
         </pre>
     </div>
-
     <div class="step slide" data-x="12000" data-y="-1500">
         <h3>General representation allows general algorithms</h3>
         <pre>
@@ -356,7 +292,6 @@
             </code>
         </pre>
     </div>
-
     <div class="step slide" data-x="13200" data-y="-1500">
         <h3>General representation allows general algorithms</h3>
         <pre>
@@ -381,6 +316,7 @@
     if we have ways to
     1. f(fix(f)) => f(a)
     2. f(a) => a
+    3. f(fix(f)) => a // inductively from 1 and 2
 
     We could do this
     f(f(f(fix(f)))) // apply rule 1
@@ -391,33 +327,31 @@
             </code>
         </pre>
     </div>
-    <div class="step slide" data-x="18000" data-y="-1500">
+    <div class="step slide" data-x="15600" data-y="-1500">
         <h3>Concrete example</h3>
         <pre>
             <code class="scala">
 
-    One(One(Zero)) // Step 1: Zero[Fix[Peano]] => Zero[Int]
-    One(One(0))    // Step 2: Zero[Int] => Int
-    One(1+0)       // Step 3: One[Int] => Int
-    1+1+0          // Step 4: Int!!
+    One(One(Zero())) // Step 1: Zero[Fix[Peano]] => 0
+    One(One(0))      // Step 2: One(0) => 1 + 0
+    One(1+0)         // Step 3: One(1) => 1 + 1
+    1+1+0            // Step 4: 2!!
             </code>
         </pre>
     </div>
-    <div class="step slide" data-x="19200" data-y="-1500">
+    <div class="step slide" data-x="16800" data-y="-1500">
         <h3>Comparison</h3>
         <img src="https://user-images.githubusercontent.com/6303687/67306018-3039d100-f4ee-11e9-8ab4-6c08bba69e00.png" alt=""/>
     </div>
-
-    <div class="step slide" data-x="20400" data-y="-1500">
+    <div class="step slide" data-x="18000" data-y="-1500">
         <h2>Summary</h2>
         <ul>
             <li>Fix point is a value of a function's domain where f(x)=x </li>
             <li>Fix point can be defined for type level function</li>
             <li>When used at type level, Fix Point can represent arbitrary layer of recursive data structure</li>
-            <li>The benefit of using Fix is to be able to leverage library code</li>
+            <li>The benefit of using Fix is to be able to leverage library code for recursion</li>
         </ul>
     </div>
-
 
     <div id="overview" class="step" data-x="3000" data-y="1500" data-z="0" data-scale="10">
     </div>
